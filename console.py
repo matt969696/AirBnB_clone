@@ -195,18 +195,18 @@ class HBNBCommand(cmd.Cmd):
         inst.save()
         models.storage.reload()
 
-    def precmd(self, line):
+    def default(self, line):
         """Method called before the line is interpreted"""
         parsed = ""
         test1 = line.find(".")
         if test1 == -1 or line[:test1] not in self.classlist:
-            return line
+            return cmd.Cmd.onecmd(self, line)
         parsed1 = line[test1 + 1:]
         item1 = line[:test1]
 
         test2 = parsed1.find("(")
         if test2 == -1 or parsed1[:test2] not in self.funclist:
-            return line
+            return cmd.Cmd.onecmd(self, line)
         parsed2 = parsed1[test2 + 1:-1]
         item2 = parsed1[:test2]
 
@@ -223,7 +223,7 @@ class HBNBCommand(cmd.Cmd):
             parsed3 = parsed3 + " " + token
 
         finalline = item2 + " " + item1 + parsed3 + " " + parseddic
-        return finalline
+        return cmd.Cmd.onecmd(self, finalline)
 
 if __name__ == '__main__':
     HBNBCommand().cmdloop()

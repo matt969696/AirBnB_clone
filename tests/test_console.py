@@ -9,6 +9,13 @@ import json
 import console
 import sys
 import os
+from models.base_model import BaseModel
+from models.place import Place
+from models.amenity import Amenity
+from models.city import City
+from models.review import Review
+from models.state import State
+from models.user import User
 from models import storage
 from models.engine.file_storage import FileStorage
 from io import StringIO
@@ -303,3 +310,37 @@ class TestHBNBCommand_global(unittest.TestCase):
         with patch("sys.stdout", new=StringIO()) as f:
             self.assertFalse(HBNBCommand().onecmd("destroy Review 1"))
             self.assertEqual(h, f.getvalue().strip())
+
+    def test_count_(self):
+        """ Test count """
+        c = {
+                'User': User, 'City': City, 'State': State, 'Amenity': Amenity,
+                'Place': Place, 'Review': Review,
+                'BaseModel': BaseModel
+                }
+        counter = 0
+        for i in c.keys():
+            counter = 0
+            o = c[i]()
+            x = storage.all()
+            for y in x:
+                if i in y:
+                    counter += 1
+            with patch('sys.stdout', new=StringIO()) as f:
+                HBNBCommand().onecmd("{}.count()".format(i))
+            self.assertEqual(counter, int(f.getvalue().strip()))
+
+    def test_dot_all_with_all_classes(self):
+        """ Test with all classes """
+        c = {
+                'User': User, 'City': City, 'State': State, 'Amenity': Amenity,
+                'Place': Place, 'Review': Review,
+                'BaseModel': BaseModel
+                }
+        if os.path.exists("file.json"):
+            os.remove("file.json")
+        for i in c.keys():
+            o = c[i]()
+            with patch('sys.stdout', new=StringIO()) as f:
+                HBNBCommand().onecmd("{}.all()".format(i))
+            self.assertTrue(str(o) in f.getvalue())
