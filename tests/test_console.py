@@ -344,3 +344,19 @@ class TestHBNBCommand_global(unittest.TestCase):
             with patch('sys.stdout', new=StringIO()) as f:
                 HBNBCommand().onecmd("{}.all()".format(i))
             self.assertTrue(str(o) in f.getvalue())
+
+    def test_update_with_all_classes(self):
+        """ Test with all classes """
+        c = {
+                'User': User, 'City': City, 'State': State, 'Amenity': Amenity,
+                'Place': Place, 'Review': Review,
+                'BaseModel': BaseModel
+                }
+        for i in c.keys():
+            o = c[i]()
+            with patch('sys.stdout', new=StringIO()) as x:
+                s = "Matt"
+                HBNBCommand().onecmd("update {} {} xd {}".format(i, o.id, s))
+            with patch('sys.stdout', new=StringIO()) as f:
+                HBNBCommand().onecmd("show {} {}".format(i, o.id))
+            self.assertTrue("Matt" in f.getvalue())
