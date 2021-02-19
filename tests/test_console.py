@@ -360,3 +360,133 @@ class TestHBNBCommand_global(unittest.TestCase):
             with patch('sys.stdout', new=StringIO()) as f:
                 HBNBCommand().onecmd("show {} {}".format(i, o.id))
             self.assertTrue("Matt" in f.getvalue())
+
+    def test_del_with_all_classes(self):
+        """ Test with all classes """
+        c = {
+                'User': User, 'City': City, 'State': State, 'Amenity': Amenity,
+                'Place': Place, 'Review': Review,
+                'BaseModel': BaseModel
+                }
+        for i in c.keys():
+            o = c[i]()
+            with patch('sys.stdout', new=StringIO()) as x:
+                s = "Matt"
+                uo = o.id
+            with patch('sys.stdout', new=StringIO()) as z:
+                HBNBCommand().onecmd("destroy {} {}".format(i, o.id))
+            with patch('sys.stdout', new=StringIO()) as f:
+                HBNBCommand().onecmd("show {} {}".format(i, uo))
+            self.assertEqual("** no instance found **\n",  f.getvalue())
+
+    def test_all_with_all_classes(self):
+        """ Test with all classes """
+        c = {
+                'User': User, 'City': City, 'State': State, 'Amenity': Amenity,
+                'Place': Place, 'Review': Review,
+                'BaseModel': BaseModel
+                }
+        if os.path.exists("file.json"):
+            os.remove("file.json")
+        for i in c.keys():
+            o = c[i]()
+            with patch('sys.stdout', new=StringIO()) as f:
+                HBNBCommand().onecmd("all {}".format(i))
+            self.assertTrue(str(o) in f.getvalue())
+
+    def test_all_class_doesnt_exist_missing_err_msg(self):
+        """ Test that all return a msg error """
+        with patch('sys.stdout', new=StringIO()) as f:
+            HBNBCommand().onecmd("all udzhdz")
+        self.assertEqual("** class doesn't exist **", f.getvalue().strip())
+
+    def test_update_name_class_missing_err_msg(self):
+        """ Test that update return a msg error """
+        with patch('sys.stdout', new=StringIO()) as f:
+            HBNBCommand().onecmd("update")
+        self.assertEqual("** class name missing **", f.getvalue().strip())
+
+    def test_update_wrong_name_class_err_msg(self):
+        """ Test that update return a msg error """
+        with patch('sys.stdout', new=StringIO()) as f:
+            HBNBCommand().onecmd("update ijd")
+        self.assertEqual("** class doesn't exist **", f.getvalue().strip())
+
+    def test_update_no_id_given_err_msg(self):
+        """ Test that update return a msg error """
+        with patch('sys.stdout', new=StringIO()) as f:
+            HBNBCommand().onecmd("update BaseModel")
+        self.assertEqual("** instance id missing **", f.getvalue().strip())
+
+    def test_update_instance_doesnt_exist_err_msg(self):
+        """ Test that update return a msg error """
+        with patch('sys.stdout', new=StringIO()) as f:
+            HBNBCommand().onecmd("update BaseModel 654448")
+        self.assertEqual("** no instance found **", f.getvalue().strip())
+
+    def test_dot_show(self):
+        """ Test .show() with all classes """
+        storage.reload()
+        c = {
+                'User': User, 'City': City, 'State': State, 'Amenity': Amenity,
+                'Place': Place, 'Review': Review,
+                'BaseModel': BaseModel
+                }
+        for i in c.keys():
+            o = c[i]()
+            with patch('sys.stdout', new=StringIO()) as f:
+                HBNBCommand().onecmd("{}.show(\"{}\")".format(i, str(o.id)))
+            self.assertEqual(str(o) + '\n', f.getvalue())
+
+    def test_dot_del_with_all_classes(self):
+        """ Test with all classes """
+        c = {
+                'User': User, 'City': City, 'State': State, 'Amenity': Amenity,
+                'Place': Place, 'Review': Review,
+                'BaseModel': BaseModel
+                }
+        for i in c.keys():
+            o = c[i]()
+            with patch('sys.stdout', new=StringIO()) as x:
+                s = "Matt"
+                uo = o.id
+            with patch('sys.stdout', new=StringIO()) as z:
+                HBNBCommand().onecmd("{}.destroy(\"{}\")".format(i, o.id))
+            with patch('sys.stdout', new=StringIO()) as f:
+                HBNBCommand().onecmd("show {} {}".format(i, uo))
+            self.assertEqual("** no instance found **\n",  f.getvalue())
+
+    def test_dot_update_with_all_classes(self):
+        """ Test with all classes """
+        c = {
+                'User': User, 'City': City, 'State': State, 'Amenity': Amenity,
+                'Place': Place, 'Review': Review,
+                'BaseModel': BaseModel
+                }
+        for i in c.keys():
+            o = c[i]()
+            with patch('sys.stdout', new=StringIO()) as x:
+                s = "Matt"
+                comm = "{}.update(\"{}\", xd, {})".format(i, o.id, s)
+                HBNBCommand().onecmd(comm)
+            with patch('sys.stdout', new=StringIO()) as f:
+                HBNBCommand().onecmd("show {} {}".format(i, o.id))
+            self.assertTrue("Matt" in f.getvalue())
+
+    def test_dot_dict_update_with_all_classes(self):
+        """ Test with all classes """
+        c = {
+                'User': User, 'City': City, 'State': State, 'Amenity': Amenity,
+                'Place': Place, 'Review': Review,
+                'BaseModel': BaseModel
+                }
+        for i in c.keys():
+            o = c[i]()
+            with patch('sys.stdout', new=StringIO()) as x:
+                s = "Matt"
+                comm = "{}.update(\"{}\", ".format(i, o.id, s)
+                comm += "{'xd': 'Matt'})"
+                HBNBCommand().onecmd(comm)
+            with patch('sys.stdout', new=StringIO()) as f:
+                HBNBCommand().onecmd("show {} {}".format(i, o.id))
+            self.assertTrue("Matt" in f.getvalue())
